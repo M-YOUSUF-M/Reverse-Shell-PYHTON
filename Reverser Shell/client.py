@@ -3,17 +3,15 @@ import subprocess
 import os
 import platform
 
+
 server = socket.socket()
-host = "192.168.0.107" #change this IP according to your server IP
+
+host = input("enter server IP: ") 
 port = 9999
 
 server.connect((host, port))
 
-def clear_screen():
-    if platform.system() == "Windows":
-        subprocess.call("cls", shell=True)
-    else:
-        subprocess.call("clear", shell=True)
+
 
 def list_files():
     files = os.listdir()
@@ -91,9 +89,6 @@ while True:
             output = change_directory(argument)
         elif command == "sysinfo":
             output = system_info()
-        elif command == "clear":
-            clear_screen()
-            output = ""
         elif command == "pwd":
             output = os.getcwd()
         elif command == "help":
@@ -106,11 +101,12 @@ while True:
                      "  sysinfo - Display system information\n" \
                      "  clear - Clear the screen\n" \
                      "  exit - Exit the command prompt\n"
+            server.send(output.encode("utf-8"))
         elif command == "exit":
-            server.close()
+            server.close() 
             break
         else:
-            output = "Unknown command. Type 'help' for available commands.\n"
-        
-        if output:
+            if command != "clear":
+                output = "Unknown command. Type 'help' for available commands.\n"
+        if len(output) > 0:
             server.send(output.encode("utf-8"))
