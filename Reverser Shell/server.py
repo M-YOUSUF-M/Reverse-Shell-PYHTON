@@ -2,6 +2,15 @@ import socket
 import sys
 import os
 import threading
+import platform
+import subprocess
+
+#clear function
+def clear_screen():
+    if platform.system() == "Windows":
+        subprocess.call("cls", shell=True)
+    else:
+        subprocess.call("clear", shell=True)
 
 # Create a socket
 def socket_create():
@@ -37,18 +46,24 @@ def socket_accept():
 def send_command(conn):
     try:
         while True:
-            cmd = input(f"{os.getcwd()}~# ")
+            cmd = input(f"~# ")
             if cmd == "exit":
+                conn.send(cmd.encode())
                 conn.close()
                 server.close()
                 sys.exit()
             if len(cmd) > 0:
-                conn.send(cmd.encode())
-                client_response = conn.recv(1024).decode("utf-8")
-                print(client_response)
+                if(cmd == "clear"):
+                    clear_screen()
+                else:
+                    conn.send(cmd.encode())
+                    client_response = conn.recv(1024).decode("utf-8")
+                    print(client_response)
     except socket.error as msg:
         print(f"Connection error: {msg}")
         conn.close()
+        server.close()
+        # sys.exit()
 
 # Main function
 def main():
